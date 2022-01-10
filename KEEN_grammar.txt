@@ -1,0 +1,171 @@
+statements  : NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
+
+statement   : KEYWORD:RETURN expr?
+            : KEYWORD:CONTINUE
+            : KEYWORD:BREAK
+            : expr
+
+expr        : KEYWORD:VAR IDENTIFIER EQ expr
+            : comp-expr ((KEYWORD:AND|KEYWORD:OR) comp-expr)*
+
+comp-expr   : NOT comp-expr
+            : arith-expr ((EE|LT|GT|LTE|GTE) arith-expr)*
+
+arith-expr  :	term ((PLUS|MINUS) term)*
+
+term        : factor ((MUL|DIV) factor)*
+
+factor      : (PLUS|MINUS) factor
+            : power
+
+power       : call (POW factor)*
+
+call        : atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
+
+atom        : INT|FLOAT|STRING|IDENTIFIER
+            : LPAREN expr RPAREN
+            : list-expr
+            : if-expr
+            : for-expr
+            : while-expr
+            : func-def
+
+list-expr   : LSQUARE (expr (COMMA expr)*)? RSQUARE
+
+if-expr     : KEYWORD:IF expr KEYWORD:DO
+              (statement if-expr-b|if-expr-c?)
+            | (NEWLINE statements KEYWORD:END|if-expr-b|if-expr-c)
+
+if-expr-b   : KEYWORD:ELIF expr KEYWORD:DO
+              (statement if-expr-b|if-expr-c?)
+            | (NEWLINE statements KEYWORD:END|if-expr-b|if-expr-c)
+
+if-expr-c   : KEYWORD:ELSE
+              statement
+            | (NEWLINE statements KEYWORD:END)
+
+for-expr    : KEYWORD:FOR IDENTIFIER EQ expr KEYWORD:TO expr 
+              (KEYWORD:STEP expr)? KEYWORD:DO
+              statement
+            | (NEWLINE statements KEYWORD:END)
+
+while-expr  : KEYWORD:WHILE expr KEYWORD:DO
+              statement
+            | (NEWLINE statements KEYWORD:END)
+
+func-def    : KEYWORD:FUN IDENTIFIER?
+              LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
+              (ARROW expr)
+            | (NEWLINE statements KEYWORD:END)
+
+* = zero or more
+? = optional
+
+
+
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+----In command prompt:----
+py E:\Lewis_KeenLanguage\shell.py
+
+----if drive taken:-------
+py F:\Lewis_KeenLanguage\shell.py
+
+
+ TESTING SCRIPTS
+
+#---WHILE LOOP TEST---# 
+ stor wi=0
+ while wi < 100000 do stor wi=wi+1
+ while wi > 0 do stor wi=wi-1
+ wi
+
+#Expected Output: 0
+
+
+#---FOR LOOP TEST---# 
+ stor fi=0
+ for i = 0 to 100 do for i =0 to 100 do stor fi = fi+1
+ fi
+
+#Expected Output: 10000
+
+
+#---IF TEST---#
+stor test = Nice
+if (test != Nice or test >= 0) and test == Nice do stor test = 12345 else stor test = 54321
+
+#Expected Output: 12345
+
+#---FUNCTION TEST---#
+fun add(a, b, c) -> a + b + c
+stor hi = 12
+add(hi, hi) 
+add(hi, hi, hi, hi) 
+stor hi = add(hi, hi, hi)
+hi
+
+#Expected Output: ERROR(not enough args)
+				  ERROR(too much args)
+				  36
+
+#---STRING(FUNC) TEST---#
+fun greet(name, emphasization) -> "Hello, " * emphasization + name
+greet("Mckeen", 5)
+
+#Expected Output: "Hello, Hello, Hello, Hello, Hello, Mckeen"
+
+#---LIST TEST---#
+stor list =[[1,2,3],"Hi there",69]
+list+"How are you?"
+list/0/2
+stor list= list*list
+list/-1
+list/-3/-2
+list-0
+
+#Expected Output: [[1, 2, 3], "Hi there", 69, "How are you?"]
+				  3
+				  [[1, 2, 3], "Hi there", 69, [1, 2, 3], "Hi there", 69]
+				  420
+				  2
+				  ["Hi there", 69, [1, 2, 3], "Hi there", 69]
+
+#---MULTILINE TEST (console)---#
+stor a = 46; stor b = 23
+fun add(x,y) -> stor out = x + " + " + y + " = " + (x + y); print(x+y);
+add(a,b)
+
+######### Helper Functions/Values #########
+
+Null~~~~~~~~~~~~~~~~~~~~~~~~~~ = 0
+Nice~~~~~~~~~~~~~~~~~~~~~~~~~~ = 42069
+True~~~~~~~~~~~~~~~~~~~~~~~~~~ = 1
+False~~~~~~~~~~~~~~~~~~~~~~~~~ = 0
+pi~~~~~~~~~~~~~~~~~~~~~~~~~~~~ = Math.pi()
+
+
+Print(STOR)~~~~~~~~~~~~~~~~~~~~~~~ Prints a value, returns Null if successful
+PrintRet(FUNC)~~~~~~~~~~~~~~~~~~~~ Prints the returned value of a function
+Input()~~~~~~~~~~~~~~~~~~~~~~~~~~~ Inputs a STRING
+InputInt()~~~~~~~~~~~~~~~~~~~~~~~~ Inputs an INT, asks again if not an integer
+Cls() or Clear()~~~~~~~~~~~~~~~~~~ Clears screen, returns Null if successful
+IsNum(STOR)~~~~~~~~~~~~~~~~~~~~~~~ Returns True if STOR is a INT or FLOAT
+IsString(STOR)~~~~~~~~~~~~~~~~~~~~ Returns True if STOR is a STRING
+IsList(STOR)~~~~~~~~~~~~~~~~~~~~~~ Returns True if STOR is a LIST
+IsFun(STOR)~~~~~~~~~~~~~~~~~~~~~~~ Returns True if STOR is a FUNCTION
+Append(LIST, STOR)~~~~~~~~~~~~~~~~ Appends a STOR to a list, returns Null if successful (Equivalent to 'stor list = list * var') CANNOT BE USED WITH SAME VARIABLE
+Extend()~~~~~~~~~~~~~~~~~~~~~~~~~~ Appends all of a LIST's elements to a list, returns Null if successful (Equivalent to 'stor list1 = list1 * list2')
+Pop(LIST,INT)~~~~~~~~~~~~~~~~~~~~~ Removes the element of INT index of a LIST, returns removed element if successful
+Size(LIST)~~~~~~~~~~~~~~~~~~~~~~~~ Returns the size of a LIST
+Run("FILENAME")~~~~~~~~~~~~~~~~~~~ Runs a file, returns Null if successful
+
+
+
+
+
+
